@@ -1,0 +1,5 @@
+factor,turnover_mean,turnover_median
+momentum_20d,0.239348,0.25
+reversal_5d,0.455616,0.4375
+volatility_20d,0.189536,0.1875
+turnover_signal,0.893347,0.875
