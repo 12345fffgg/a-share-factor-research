@@ -3,6 +3,7 @@ import unittest
 import pandas as pd
 
 from src.factor_research import assign_quantiles, compute_forward_returns
+from src.factor_scoring import _linear_score
 
 
 class FactorResearchTests(unittest.TestCase):
@@ -31,6 +32,13 @@ class FactorResearchTests(unittest.TestCase):
         result = assign_quantiles(frame, "factor", 5)
         self.assertEqual(result["group"].value_counts().sort_index().tolist(), [2] * 5)
         self.assertEqual((result["group"].min(), result["group"].max()), (1, 5))
+
+    def test_fixed_score_is_clipped_to_metric_weight(self):
+        values = pd.Series([-1.0, 0.02, 1.0])
+        scores = _linear_score(values, low=0.01, high=0.03, weight=20)
+        self.assertEqual(scores.iloc[0], 0.0)
+        self.assertAlmostEqual(scores.iloc[1], 10.0)
+        self.assertEqual(scores.iloc[2], 20.0)
 
 
 if __name__ == "__main__":

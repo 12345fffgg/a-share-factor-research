@@ -27,13 +27,17 @@ def round_numeric(frame: pd.DataFrame, digits: int = 6) -> pd.DataFrame:
 
 def build_demo_panel(seed: int = 2026) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
-    dates = pd.bdate_range("2021-01-04", periods=420)
-    codes = [f"DEMO{i:04d}" for i in range(160)]
+    dates = pd.bdate_range("2016-01-04", "2026-08-06")
+    codes = [f"DEMO{i:04d}" for i in range(80)]
     market = rng.normal(0.0003, 0.009, len(dates))
     rows: list[pd.DataFrame] = []
 
     for index, code in enumerate(codes):
-        idiosyncratic = rng.normal(0, 0.018, len(dates))
+        shocks = rng.normal(0, 0.016, len(dates))
+        idiosyncratic = np.empty(len(dates))
+        idiosyncratic[0] = shocks[0]
+        for day in range(1, len(dates)):
+            idiosyncratic[day] = -0.45 * idiosyncratic[day - 1] + shocks[day]
         returns = market + idiosyncratic
         close = (12 + index / 18) * np.cumprod(1 + returns)
         turnover = rng.lognormal(-2.2, 0.55, len(dates))
